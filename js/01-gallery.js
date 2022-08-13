@@ -3,28 +3,53 @@ import SimpleLightbox from '/simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { galleryItems } from './gallery-items';
 // Change code below this line
+const refs = {
+    gallery: document.querySelector('.gallery'),
+}
+let galleryLightBox;
+refs.gallery.innerHTML = createGalleryMarkup(galleryItems);
+refs.gallery.addEventListener('click', onGalleryItemClick);
+function onGalleryItemClick(e) {
+    e.preventDefault();
 
-console.log(galleryItems);
+    const image = e.target;
+    if (!image.classList.contains('gallery__image')) {
+        return;
+    }
+    const lightboxImage = createImageLightbox(image);
+    galleryLightBox = basicLightbox.create(lightboxImage,
+        {
+            onShow: (instance) => {
+                document.addEventListener('keydown', onEscPress);
+            },
+            onClose: (instance) => {
+                document.removeEventListener('keydown', onEscPress)
+            },
+        }
+    );
+    galleryLightBox.show();
+}
 
-const galleryRef = document.querySelector('.gallery');
-
-const galleryMarkup = createGalleryMurkup(galleryItems);
-galleryRef.innerHTML = galleryMarkup;
-
-const gallery = new SimpleLightbox('.gallery  a', {
-  scrollZoom: false,
-  captionsData: 'alt',
-  captionDelay: 250,
-});
-
-function createGalleryMurkup(gallery) {
-  return gallery
-    .map(image => {
-      return `
-        <a class="gallery__item" href="${image.original}">
-            <img class="gallery__image" src="${image.preview}" alt="${image.description}"/>
-        </a>
-        `;
-    })
-    .join('');
+function createGalleryMarkup(items) {
+    return items.map(({ preview, original, description }) => {
+            return `<div class="gallery__item">
+                        <a class="gallery__link" href="${original}">
+                            <img
+                            class="gallery__image"
+                            src="${preview}"
+                            data-source="${original}"
+                            alt="${description}"
+                            />
+                        </a>
+                    </div>`})
+        .join('');
+}
+function createImageLightbox(image) {
+    return `<img src="${image.dataset["source"]}">`;
+}
+function onEscPress(e) {
+    if (e.code !== 'Escape') {
+        return;
+    }
+    galleryLightBox.close();
 }
