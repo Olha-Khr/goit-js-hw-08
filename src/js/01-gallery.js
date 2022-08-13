@@ -3,7 +3,7 @@ import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-import { galleryItems } from './gallery-items';
+import { galleryItems } from './gallery-items.js';
 // Change code below this line
 
 const refs = {
